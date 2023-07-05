@@ -16,11 +16,20 @@ client.on('ready', (c) => {
     console.log(`${c.user.tag} is online.`);
 });
 
-client.on('messageCreate', (message) => {
-    if (message.author.bot) {
-        return;
+// ___________Lesson 1______________
+// client.on('messageCreate', (message) => {
+//     if (message.author.bot) {
+//         return;
+//     }
+//     console.log(message.content)
+// })
+
+client.on('interactionCreate', (interaction) => {
+    if (!interaction.isChatInputCommand()) return;
+
+    if(interaction.commandName === 'hey') {
+        interaction.reply('hey!');
     }
-    console.log(message.content)
 })
 
 client.login(process.env.TOKEN);
