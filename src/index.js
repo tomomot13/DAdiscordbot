@@ -15,7 +15,7 @@ const client = new Client({
 
 const member_devo = new Map();
 
-cron.schedule('0 5 * * *', function() {
+cron.schedule('0 4 * * *', function() {
     client.channels.cache.get(process.env.CHANNEL_ID).send("Good Morning.");
     for(let [user, is_devo] of member_devo){
         if(is_devo === 0){
