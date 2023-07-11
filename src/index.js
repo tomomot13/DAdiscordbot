@@ -13,22 +13,34 @@ const client = new Client({
     ]
 })
 
+// STILL IN PROGRESS
+// class UserInfo{
+//     constructor(is_devo, view_streak, streaks){
+//         this.is_devo = is_devo;
+//         this.view_streak = view_streak;
+//         this.streaks = streaks;
+//     }
+// }
+
+const monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October","November","December"];
+// Maps a user class to a UserInfo.
 const member_devo = new Map();
 
+//cron.schedule('* * * * *', function() {
 cron.schedule('0 4 * * *', function() {
-    client.channels.cache.get(process.env.CHANNEL_ID).send("Good Morning.");
+    var date = new Date();
+    client.channels.cache.get(process.env.CHANNEL_ID).send(`***[${monthNames[date.getMonth()]} ${date.getDate()}] Daily Accountability Check:***`);
     for(let [user, is_devo] of member_devo){
         if(is_devo === 0){
             console.log(`${user.username} did not do their devotion.`);
-            client.channels.cache.get(process.env.CHANNEL_ID).send(`${user} Reminder to do your devotion.`);
+            client.channels.cache.get(process.env.CHANNEL_ID).send(`${user}: Reminder to do your devotion.`);
         }
         else if(is_devo === 2){
-            console.log(`${user.username} wrote a short devotion.`);
-            client.channels.cache.get(process.env.CHANNEL_ID).send(`${user} Encouragement to go more in-depth with your devotion.`);
+            client.channels.cache.get(process.env.CHANNEL_ID).send(`${user}: Encouragement to go more in-depth with your devotion.`);
         }
         else{
-            console.log(`${user.username} did do their devotion.`);
-            //client.channels.cache.get(process.env.CHANNEL_ID).send(`${user.username} did do their devotion.`);
+            //console.log(`${user.username} did do their devotion.`);
+            client.channels.cache.get(process.env.CHANNEL_ID).send(`${user}: ✅`);
         }
         member_devo.set(user, 0);
 
@@ -39,9 +51,12 @@ client.on('ready', (c) => {
     console.log(`${c.user.tag} is online.`);
 });
 
-// ___________Lesson 1______________
+
 client.on('messageCreate', (message) => {
-    if (message.author.bot) {
+    if(message.channelId !== process.env.CHANNEL_ID){
+        return;
+    }
+    else if (message.author.bot) {
         return;
     }
     else{
@@ -51,10 +66,14 @@ client.on('messageCreate', (message) => {
                     member_devo.set(user, 1);
                 }
                 else if(message.content.length <= 200){
+                    if(is_devo === 0){
+                        console.log(`${user.username} wrote a short devotion.`);
+                    }
                     member_devo.set(user, 2);
                 }
                 else{
                     member_devo.set(user, 1);
+                    console.log(`${user.username} did do their devotion.`);
                 }
             }
         }
@@ -62,13 +81,39 @@ client.on('messageCreate', (message) => {
     //console.log(message.content)
 })
 
-// client.on('interactionCreate', (interaction) => {
-//     if (!interaction.isChatInputCommand()) return;
+// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! STILL UNDER PROCESS !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+client.on('interactionCreate', (interaction) => {
+    if (!interaction.isChatInputCommand()) return;
 
-//     if(interaction.commandName === 'hey') {
-//         interaction.reply('hey!');
-//     }
-// })
+    
+
+    if(interaction.commandName === 'set_devotion') {
+        command_set_devotion(interaction);
+    }
+    else if(interaction.commandName === 'toggle_streak'){
+        command_toggle_streak(interaction);
+    }
+})
+
+function command_set_devotion(interaction){
+    if(interaction.channelId !== process.env.TEST_CHANNEL_ID) return;
+    const user_encased = interaction.options.get('user');
+    const value_encased = interaction.options.get('value');
+
+    const user = user_encased.user;
+    const value = value_encased.value;
+    //console.log(user);
+    //console.log(value);
+    member_devo.set(user, value);
+    console.log(`Set ${user.username} to ${value}.`);
+
+    return;
+}
+
+// STILL IN PROGRESS
+function command_toggle_streak(interaction){
+    return;
+}
 
 //client.login(process.env.TOKEN);
 
@@ -77,6 +122,8 @@ client.login(process.env.TOKEN).then(() => {
     client.guilds.cache.get(process.env.GUILD_ID).members.fetch().then((memberMap) => {
         for(let [id, GuildMember] of memberMap){
             if(!GuildMember.user.bot){
+                // STILL IN PROGRESS
+                //var user_info = UserInfo(0, true, 0);
                 member_devo.set(GuildMember.user, 0);
             }
         }

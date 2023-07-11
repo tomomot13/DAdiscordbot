@@ -1,11 +1,29 @@
 require('dotenv').config();
-const { REST, Routes } = require('discord.js');
+const { REST, Routes, ApplicationCommandOptionType } = require('discord.js');
 
 const commands = [
     {
-        name: 'hey',
-        description: 'Replies with hey!',
+        name: 'set_devotion',
+        description: '[For Testing] Sets devotion of a user to specified value.',
+        options: [
+            {
+                name: 'user',
+                description: 'The user to set devotion.',
+                type: ApplicationCommandOptionType.User,
+                required: true
+            },
+            {
+                name: 'value',
+                description: 'Value of devotion.',
+                type: ApplicationCommandOptionType.Integer,
+                required: true
+            }
+        ]
     },
+    {
+        name: 'toggle_streak',
+        description: 'Toggle to make streaks visible or not visible.'
+    }
 ];
 
 const rest = new REST({version: '10'}).setToken(process.env.TOKEN);
