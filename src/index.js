@@ -30,6 +30,20 @@ const member_devo = new Map();
 cron.schedule('0 4 * * *', function() {
     var date = new Date();
     client.channels.cache.get(process.env.CHANNEL_ID).send(`***[${monthNames[date.getMonth()]} ${date.getDate()}] Daily Accountability Check:***`);
+    
+    //Check for new users who didn't send a devotional yet  //Issue: For a user that joined that day and not sent a message yet, it will not include them in the checklist.
+    // Possible solution: check when a user enters the server.
+    client.guilds.cache.get(process.env.GUILD_ID).members.fetch().then((memberMap) => {
+        for(let [id, GuildMember] of memberMap){
+            if(!GuildMember.user.bot){
+                if(!member_devo.has(GuildMember.user)){
+                    member_devo.set(GuildMember.user, 0);
+                    console.log(`Added ${GuildMember.user.username} with 0.`);
+                }
+            }
+        }
+    }).catch(console.error);
+    
     for(let [user, is_devo] of member_devo){
         if(is_devo === 0){
             console.log(`${user.username} did not do their devotion.`);
@@ -75,8 +89,19 @@ client.on('messageCreate', (message) => {
                     member_devo.set(user, 1);
                     console.log(`${user.username} did do their devotion.`);
                 }
+                return;
             }
         }
+        // If New User Joins In and sends a devotion
+        if(message.content.length <= 200){
+            member_devo.set(message.author, 2);
+            console.log(`Added ${message.author.username} with 2.`);
+        }
+        else{
+            member_devo.set(message.author, 1);
+            console.log(`Added ${message.author.username} with 1.`);
+        }
+        
     }
     //console.log(message.content)
 })
