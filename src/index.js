@@ -1,4 +1,5 @@
 require('dotenv').config();
+require('console-stamp')(console, 'HH:MM:ss');
 const cron = require('node-cron');
 const { Client, IntentsBitField} = require('discord.js');
 
@@ -29,7 +30,8 @@ const member_devo = new Map();
 //cron.schedule('* * * * *', function() {
 cron.schedule('0 4 * * *', function() {
     var date = new Date();
-    client.channels.cache.get(process.env.CHANNEL_ID).send(`***[${monthNames[date.getMonth()]} ${date.getDate()}] Daily Accountability Check:***`);
+    var message = `***[${monthNames[date.getMonth()]} ${date.getDate()}] Daily Accountability Check:***\n`;
+    //client.channels.cache.get(process.env.CHANNEL_ID).send(`***[${monthNames[date.getMonth()]} ${date.getDate()}] Daily Accountability Check:***`);
     
     //Check for new users who didn't send a devotional yet  //Issue: For a user that joined that day and not sent a message yet, it will not include them in the checklist.
     // Possible solution: check when a user enters the server.
@@ -47,18 +49,23 @@ cron.schedule('0 4 * * *', function() {
     for(let [user, is_devo] of member_devo){
         if(is_devo === 0){
             console.log(`${user.username} did not do their devotion.`);
-            client.channels.cache.get(process.env.CHANNEL_ID).send(`${user}: Reminder to do your devotion.`);
+            message += `${user}: Reminder to do your devotion.\n`;
+            //client.channels.cache.get(process.env.CHANNEL_ID).send(`${user}: Reminder to do your devotion.`);
         }
         else if(is_devo === 2){
-            client.channels.cache.get(process.env.CHANNEL_ID).send(`${user}: Encouragement to go more in-depth with your devotion.`);
+            message += `${user}: Encouragement to go more in-depth with your devotion.\n`;
+            //client.channels.cache.get(process.env.CHANNEL_ID).send(`${user}: Encouragement to go more in-depth with your devotion.`);
         }
         else{
             //console.log(`${user.username} did do their devotion.`);
-            client.channels.cache.get(process.env.CHANNEL_ID).send(`${user}: ✅`);
+            message += `${user}: ✅\n`;
+            //client.channels.cache.get(process.env.CHANNEL_ID).send(`${user}: ✅`);
         }
         member_devo.set(user, 0);
 
     }
+    client.channels.cache.get(process.env.CHANNEL_ID).send(message);
+    console.log(message);
 });
 
 client.on('ready', (c) => {
@@ -76,6 +83,10 @@ client.on('messageCreate', (message) => {
     else{
         for(let [user, is_devo] of member_devo){
             if(user.id === message.author.id){
+                if(message.attachments){
+                    member_devo.set(user, 1);
+                    console.log(`${user.username} did do their devotion.`);
+                }
                 if(is_devo === 1){
                     member_devo.set(user, 1);
                 }
