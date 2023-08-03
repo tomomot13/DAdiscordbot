@@ -30,8 +30,8 @@ const monthNames = ["January", "February", "March", "April", "May", "June", "Jul
 // Maps a GuildMemberUser class to a UserInfo.
 const member_devo = new Map();
 
-cron.schedule('* * * * *', function() {
-//cron.schedule('0 4 * * *', function() {
+//cron.schedule('* * * * *', function() {
+cron.schedule('0 4 * * *', function() {
     var date = new Date();
     var message = `***[${monthNames[date.getMonth()]} ${date.getDate()}] Daily Accountability Check:***\n`;
     //client.channels.cache.get(process.env.CHANNEL_ID).send(`***[${monthNames[date.getMonth()]} ${date.getDate()}] Daily Accountability Check:***`);
@@ -267,7 +267,7 @@ client.login(process.env.TOKEN).then(() => {
     console.log("I am ready");
 
     fs.readFile('data.txt', (err, text) => {
-        if (err) throw err;
+        if (err) return;
             //console.log(text.toString());
         processFile(text.toString());
     })
