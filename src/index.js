@@ -210,10 +210,12 @@ function command_toggle_streak(interaction){
     if(user_info.view_streak){
         user_info.view_streak = false;
         console.log(`${user.username} set their view_streak = false.`);
+        interaction.reply(`${user} set streaks to hidden.`);
     }
     else{
         user_info.view_streak = true;
         console.log(`${user.username} set their view_streak = true.`);
+        interaction.reply(`${user} set streaks to visible.`);
     }
     return;
 }
