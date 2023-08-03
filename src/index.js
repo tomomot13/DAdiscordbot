@@ -217,6 +217,7 @@ function command_toggle_streak(interaction){
         console.log(`${user.username} set their view_streak = true.`);
         interaction.reply(`${user} set streaks to visible.`);
     }
+    UpdateFile();
     return;
 }
 
