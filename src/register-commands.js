@@ -21,6 +21,24 @@ const commands = [
         ]
     },
     {
+        name: 'set_streak',
+        description: '[For Testing] Sets streak of a user to specified value.',
+        options: [
+            {
+                name: 'user',
+                description: 'The user to set streak.',
+                type: ApplicationCommandOptionType.User,
+                required: true
+            },
+            {
+                name: 'value',
+                description: 'Value of streak.',
+                type: ApplicationCommandOptionType.Integer,
+                required: true
+            }
+        ]
+    },
+    {
         name: 'toggle_streak',
         description: 'Toggle to make streaks visible or not visible.'
     }
